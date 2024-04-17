@@ -41,10 +41,12 @@ void app_main(void)
     if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == GPIO_PIN_SET)
     {
         floodFlag = 0;
+        openValve();
     }
     else
     {
         floodFlag = 1;
+        closeValve();
     }
     HAL_Delay(500);
     valve_open = !floodFlag;
@@ -61,7 +63,7 @@ void app_main(void)
         if (now - holdTime >= 1500 && buttonState == 1)
         {
         	// Check if the button is pressed and the valve is open
-        	if ((HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET) && HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == GPIO_PIN_SET)
+        	if ((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET) && HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == GPIO_PIN_SET)
         	{
         		openValve();            // Open the valve
         		strcpy(message, "valve open\r\n");
@@ -79,6 +81,13 @@ void app_main(void)
         // Close the valve if the flood flag is set
         if (floodFlag)
         {
+    		if(now - alert_time > 5000)
+    		{
+            	strcpy(message, "Flood\r\n");
+            	console(message);
+    			alert();
+    			alert_time = now;
+    		}
         	if(valve_open)
         	{
         		for(int i=0; i<=1;i++)
@@ -89,17 +98,6 @@ void app_main(void)
 
         		strcpy(message, "valve closed\r\n");
         		console(message);
-        		alert();
-        	}
-        	else
-        	{
-        		if(now - alert_time > 5000)
-        		{
-                	strcpy(message, "Flood\r\n");
-                	console(message);
-        			alert();
-        			alert_time = now;
-        		}
         	}
         }
 
@@ -115,7 +113,7 @@ void app_main(void)
         {
         	strcpy(message, "Entering Sleep\r\n");
         	console(message);
-        	HAL_PWR_EnableSleepOnExit();   // Enable sleep mode
+        	HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);   // Enable sleep mode
         }
     }
 }
@@ -127,7 +125,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
     sleep_time = HAL_GetTick();         // Update sleep time
 
     // Handle button press
-    if(GPIO_Pin == GPIO_PIN_13)
+    if(GPIO_Pin == GPIO_PIN_15)
     {
         buttonState++;      			// Increment button state
         holdTime = HAL_GetTick(); 		// Record button hold time
@@ -173,13 +171,13 @@ uint16_t measureBattery(void)
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, SET);           	// Enable battery voltage measurement
     HAL_ADC_Start(&hadc1);                                	// Start ADC conversion
     HAL_ADC_PollForConversion(&hadc1, 1000);              	// Wait for ADC conversion to complete
-    uint16_t analogbatt = HAL_ADC_GetValue(&hadc1);       	// Read ADC value
+    volatile uint16_t analogbatt = HAL_ADC_GetValue(&hadc1);       	// Read ADC value
     HAL_Delay(5);
     HAL_ADC_Stop(&hadc1);                                 	// Stop ADC conversion
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, RESET);         	// Disable battery voltage measurement
 
     // Check battery voltage threshold
-    if(analogbatt < 2500)
+    if(analogbatt < 2950)
     {
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, SET);        	// Trigger alert if battery voltage is below threshold
         HAL_Delay(200);
@@ -190,11 +188,9 @@ uint16_t measureBattery(void)
 
 void alert(void)
 {
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
 	HAL_Delay(1000);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
 }

@@ -1,0 +1,7 @@
+../App/app_main.c:122:6:HAL_GPIO_EXTI_Falling_Callback	8	static
+../App/app_main.c:141:6:openValve	16	static
+../App/app_main.c:155:6:closeValve	16	static
+../App/app_main.c:169:10:measureBattery	24	static
+../App/app_main.c:189:6:alert	16	static
+../App/app_main.c:199:6:console	8	static
+../App/app_main.c:33:6:app_main	32	static
