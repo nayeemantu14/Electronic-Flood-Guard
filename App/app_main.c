@@ -38,7 +38,7 @@ void batteryled(void);						// Function prototype for activating battery LED
 void console(char *log);              		// Function prototype for transmitting messages via UART
 
 // Main application function
-void app_main(void)
+void app_main()
 {
 	// Initialize message buffer with default message
 	strcpy(message, "EFloodGuard\r\n");
@@ -59,7 +59,6 @@ void app_main(void)
 		closeValve();
 	}
 	HAL_Delay(500);
-	valve_open = !floodFlag;
 	alert();
 
 	// Main loop
