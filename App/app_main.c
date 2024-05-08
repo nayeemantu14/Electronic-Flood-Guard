@@ -1,4 +1,4 @@
-// This program controls a flood guard system using an STM32 microcontroller.
+// Program Description: This program controls a flood guard system using an STM32 microcontroller.
 
 // Including necessary libraries
 #include "main.h"          					// Include main header file
@@ -19,9 +19,11 @@ uint8_t wupFlag = 0;  						// Initialize wake-up flag
 static uint8_t Low_battery;					// Initialize low battery flag
 
 volatile static uint8_t valve_open;			// Initialize valve open flag
-volatile static uint8_t floodFlag = 0;    		// Initialize flood flag
+volatile static uint8_t floodFlag = 0;    	// Initialize flood flag
 volatile static uint8_t buttonState = 0;  	// Initialize button state
 volatile static uint32_t holdTime = 0;    	// Initialize button hold time
+volatile static uint32_t releaseTime = 0;	// Initialize button release time
+volatile static uint32_t pressDuration = 0; // Initialize button press duration
 
 uint32_t last_batt_time = 0;              	// Initialize last battery reading time
 uint32_t sleep_time = 0; 					// Initialize sleep time
@@ -31,9 +33,10 @@ uint32_t alert_time = 0;					// Initialize alert time
 void openValve();                    		// Function prototype for opening the valve
 void closeValve();                    		// Function prototype for closing the valve
 void alert(void);							// Function prototype for activating the buzzer and warning LED
+void resetFloodEvent();						// Function prototype for resetting the flood event
 uint16_t measureBattery(void);        		// Function prototype for measuring battery voltage
-void monitorBattery(void);					// Function prototype for monitor battery voltage
-void statusled(void);
+void monitorBattery(void);					// Function prototype for monitoring battery voltage
+void statusled(void);						// Function prototype for system status led
 void batteryled(void);						// Function prototype for activating battery LED
 void console(char *log);              		// Function prototype for transmitting messages via UART
 
@@ -67,25 +70,23 @@ void app_main()
 		// Get current time
 		uint32_t now;
 		now = HAL_GetTick();
-
-		// Check button hold duration
-		if (now - holdTime >= 2000 && buttonState == 1)
+		// Test Mode activated by long pressing the button
+		if(pressDuration >= 2000 && !floodFlag)
 		{
-			buttonState = 0;        // Reset the button state
-			// Check if the button is pressed and the valve is open
-			if ((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET) && HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == GPIO_PIN_SET)
-			{
-				if(valve_open == 0)
-				{
-					openValve();            // Open the valve
-				}
-				strcpy(message, "valve open\r\n");
-				console(message);
-				floodFlag = 0;          	// Clear the flood flag
-			}
-			holdTime = 0;               	// Reset the hold time
+			statusled();
+			closeValve();
+			alert();
+			HAL_Delay(500);
+			statusled();
+			openValve();
+			pressDuration = 0;
 		}
-
+		// Servicing the short button press during a flood event
+		else if(pressDuration <= 500 && pressDuration >= 50)
+		{
+			resetFloodEvent();
+			pressDuration = 0;
+		}
 		// Close the valve if the flood flag is set
 		if (floodFlag)
 		{
@@ -110,15 +111,7 @@ void app_main()
 			statusled();
 			monitorBattery();
 		}
-		/*
-		// Measure battery voltage periodically
-		if (now - last_batt_time > 60000)
-		{
-			monitorBattery();
-			last_batt_time = now;                          			// Update last battery reading time
-		}*/
-		// Enter sleep mode after a specific period if no flood is detected
-		if(now - sleep_time >= 10000 && !floodFlag)
+		if(now - sleep_time >= 5000 && !floodFlag)
 		{
 			strcpy(message, "Entering Sleep\r\n");
 			console(message);
@@ -131,7 +124,23 @@ void app_main()
 	}
 }
 
-// GPIO EXTI interrupt callback
+// Callback function for rising edge interrupt on GPIO EXTI line
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+{
+	HAL_ResumeTick();
+	sleep_time = HAL_GetTick();         // Update sleep time
+	if(GPIO_Pin == GPIO_PIN_15)
+	{
+		if (buttonState == 1)
+		{
+			releaseTime = HAL_GetTick();
+			pressDuration = releaseTime - holdTime;
+		}
+		buttonState = 0;
+	}
+}
+
+// Callback function for falling edge interrupt on GPIO EXTI line
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
 	HAL_ResumeTick();
@@ -140,13 +149,8 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 	// Handle button press
 	if(GPIO_Pin == GPIO_PIN_15)
 	{
-		buttonState++;      			// Increment button state
+		buttonState = 1;
 		holdTime = HAL_GetTick(); 		// Record button hold time
-		if(buttonState>1)
-		{
-			buttonState = 0;
-		}
-		wupFlag = 1;
 	}
 	// Handle flood flag
 	if(GPIO_Pin == GPIO_PIN_6)
@@ -154,6 +158,8 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 		floodFlag = 1; // Set flood flag
 	}
 }
+
+// Callback function for TIM16 period elapsed interrupt
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim == &htim16)
@@ -191,13 +197,31 @@ void closeValve()
 	for(uint16_t i = 900; i <= 1800; i+=50)
 	{
 		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, i);   	// Set PWM duty cycle for valve Closing
-		HAL_Delay(30);
+		HAL_Delay(30
+
+);
 	}
 	HAL_Delay(50);
 	HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_1);              	// Stop PWM signal
 	HAL_Delay(50);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);  	// Deactivate valve
 	valve_open = 0;
+}
+
+// Function to reset flood event
+void resetFloodEvent()
+{
+	// Check if the button is pressed and the valve is open
+	if ((HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_SET) && HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == GPIO_PIN_SET)
+	{
+		if(valve_open == 0)
+		{
+			openValve();            // Open the valve
+		}
+		strcpy(message, "valve open\r\n");
+		console(message);
+		floodFlag = 0;          	// Clear the flood flag
+	}
 }
 
 // Function to measure battery voltage
@@ -223,6 +247,7 @@ uint16_t measureBattery(void)
 	return analogbatt;  // Return battery voltage reading
 }
 
+// Function to monitor battery voltage
 void monitorBattery(void)
 {
 	uint16_t vBatt = measureBattery();            			// Measure battery voltage
@@ -233,6 +258,8 @@ void monitorBattery(void)
 	sprintf(message, "Battery Voltage: %d\r\n", vBatt); 	// Format battery voltage message
 	console(message);                             			// Send battery voltage message via UART
 }
+
+// Function to control status LED
 void statusled(void)
 {
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
@@ -241,6 +268,7 @@ void statusled(void)
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
 }
+
 // Function to activate battery LED
 void batteryled(void)
 {
