@@ -1,0 +1,12 @@
+../App/app_main.c:42:6:app_main	24	static
+../App/app_main.c:137:6:HAL_GPIO_EXTI_Falling_Callback	16	static
+../App/app_main.c:158:6:HAL_TIM_PeriodElapsedCallback	16	static
+../App/app_main.c:168:6:openValve	16	static
+../App/app_main.c:187:6:closeValve	16	static
+../App/app_main.c:203:6:neutralValve	8	static
+../App/app_main.c:217:10:measureBattery	16	static
+../App/app_main.c:239:6:monitorBattery	24	static
+../App/app_main.c:249:6:statusled	8	static
+../App/app_main.c:258:6:batteryled	8	static
+../App/app_main.c:268:6:alert	8	static
+../App/app_main.c:278:6:console	16	static
