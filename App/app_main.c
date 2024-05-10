@@ -9,13 +9,13 @@
 // External peripheral handlers declaration
 extern ADC_HandleTypeDef hadc1;      		// Declare ADC handler
 extern TIM_HandleTypeDef htim3;      		// Declare Timer 3 handler
-extern TIM_HandleTypeDef htim16;     		// Declare Timer 16 handler
 extern UART_HandleTypeDef huart2;    		// Declare UART handler
+extern RTC_HandleTypeDef hrtc;
 
 // Global variable declaration
 char message[40];                     		// Buffer to store messages
 
-uint8_t wupFlag = 0;  						// Initialize wake-up flag
+uint8_t wupFlag = 1;  						// Initialize wake-up flag
 static uint8_t Low_battery;					// Initialize low battery flag
 
 volatile static uint8_t valve_open;			// Initialize valve open flag
@@ -25,9 +25,8 @@ volatile static uint32_t holdTime = 0;    	// Initialize button hold time
 volatile static uint32_t releaseTime = 0;	// Initialize button release time
 volatile static uint32_t pressDuration = 0; // Initialize button press duration
 
-uint32_t last_batt_time = 0;              	// Initialize last battery reading time
-uint32_t sleep_time = 0; 					// Initialize sleep time
-uint32_t alert_time = 0;					// Initialize alert time
+static uint32_t alert_time = 0;					// Initialize alert time
+static uint32_t sleep_time = 0;
 
 // Function prototypes
 void openValve();                    		// Function prototype for opening the valve
@@ -41,7 +40,7 @@ void batteryled(void);						// Function prototype for activating battery LED
 void console(char *log);              		// Function prototype for transmitting messages via UART
 
 // Main application function
-void app_main()
+int app_main()
 {
 	// Initialize message buffer with default message
 	strcpy(message, "EFloodGuard\r\n");
@@ -63,7 +62,6 @@ void app_main()
 	}
 	HAL_Delay(500);
 	alert();
-
 	// Main loop
 	while(1)
 	{
@@ -73,29 +71,29 @@ void app_main()
 		// Test Mode activated by long pressing the button
 		if(pressDuration >= 2000 && !floodFlag)
 		{
+			pressDuration = 0;
 			statusled();
 			closeValve();
 			alert();
 			HAL_Delay(500);
 			statusled();
 			openValve();
-			pressDuration = 0;
 		}
 		// Servicing the short button press during a flood event
-		else if(pressDuration <= 500 && pressDuration >= 50)
+		else if(pressDuration <= 300 && pressDuration >= 50)
 		{
-			resetFloodEvent();
 			pressDuration = 0;
+			resetFloodEvent();
 		}
 		// Close the valve if the flood flag is set
 		if (floodFlag)
 		{
 			if(now - alert_time > 5000)
 			{
+				alert_time = now;
 				strcpy(message, "Flood\r\n");
 				console(message);
 				alert();
-				alert_time = now;
 			}
 			if(valve_open == 1)
 			{
@@ -105,30 +103,24 @@ void app_main()
 			}
 		}
 
-		if(wupFlag == 1)
+		if(now - sleep_time >= 5000 && !floodFlag && wupFlag)
 		{
-			wupFlag = 0;
 			statusled();
 			monitorBattery();
-		}
-		if(now - sleep_time >= 5000 && !floodFlag)
-		{
-			strcpy(message, "Entering Sleep\r\n");
-			console(message);
 			wupFlag = 0;
-			HAL_TIM_Base_Start_IT(&htim16);
 			HAL_SuspendTick();
-			//HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);   // Enable sleep mode
-			HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON ,PWR_SLEEPENTRY_WFI);
+			HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);    	// Enable Stop mode
 		}
 	}
+	return 0;
 }
 
 // Callback function for rising edge interrupt on GPIO EXTI line
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 {
 	HAL_ResumeTick();
-	sleep_time = HAL_GetTick();         // Update sleep time
+	sleep_time = HAL_GetTick();
+	wupFlag = 1;
 	if(GPIO_Pin == GPIO_PIN_15)
 	{
 		if (buttonState == 1)
@@ -144,7 +136,8 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
 	HAL_ResumeTick();
-	sleep_time = HAL_GetTick();         // Update sleep time
+	sleep_time = HAL_GetTick();
+	wupFlag = 1;
 
 	// Handle button press
 	if(GPIO_Pin == GPIO_PIN_15)
@@ -160,15 +153,12 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 }
 
 // Callback function for TIM16 period elapsed interrupt
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-	if(htim == &htim16)
-	{
-		HAL_ResumeTick();
-		wupFlag = 1;
-	}
+	HAL_ResumeTick();
+	sleep_time = HAL_GetTick();
+	wupFlag = 1;
 }
-
 // Function to open the valve
 void openValve()
 {
@@ -199,7 +189,7 @@ void closeValve()
 		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, i);   	// Set PWM duty cycle for valve Closing
 		HAL_Delay(30
 
-);
+		);
 	}
 	HAL_Delay(50);
 	HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_1);              	// Stop PWM signal
