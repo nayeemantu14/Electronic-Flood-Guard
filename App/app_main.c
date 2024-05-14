@@ -16,6 +16,7 @@ extern RTC_HandleTypeDef hrtc;
 char message[40];                     		// Buffer to store messages
 
 uint8_t wupFlag = 1;  						// Initialize wake-up flag
+volatile static uint8_t mbatt_counter;
 static uint8_t Low_battery;					// Initialize low battery flag
 
 volatile static uint8_t valve_open;			// Initialize valve open flag
@@ -106,7 +107,10 @@ int app_main()
 		if(now - sleep_time >= 5000 && !floodFlag && wupFlag)
 		{
 			statusled();
-			monitorBattery();
+			if (mbatt_counter == 59)
+			{
+				monitorBattery();
+			}
 			wupFlag = 0;
 			HAL_SuspendTick();
 			HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);    	// Enable Stop mode
@@ -138,6 +142,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 	HAL_ResumeTick();
 	sleep_time = HAL_GetTick();
 	wupFlag = 1;
+	mbatt_counter = 59;
 
 	// Handle button press
 	if(GPIO_Pin == GPIO_PIN_15)
@@ -158,6 +163,11 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	HAL_ResumeTick();
 	sleep_time = HAL_GetTick();
 	wupFlag = 1;
+	mbatt_counter++;
+	if(mbatt_counter > 59)
+	{
+		mbatt_counter = 0;
+	}
 }
 // Function to open the valve
 void openValve()
