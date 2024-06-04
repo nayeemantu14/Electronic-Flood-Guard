@@ -11,6 +11,7 @@ extern ADC_HandleTypeDef hadc1;      		// Declare ADC handler
 extern TIM_HandleTypeDef htim3;      		// Declare Timer 3 handler
 extern UART_HandleTypeDef huart2;    		// Declare UART handler
 extern RTC_HandleTypeDef hrtc;
+extern TIM_HandleTypeDef htim16;
 
 // Global variable declaration
 char message[40];                     		// Buffer to store messages
@@ -153,7 +154,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 	// Handle flood flag
 	if(GPIO_Pin == GPIO_PIN_6)
 	{
-		floodFlag = 1; // Set flood flag
+		HAL_TIM_Base_Start_IT(&htim16);
 	}
 }
 
@@ -168,6 +169,18 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 	{
 		mbatt_counter = 0;
 	}
+}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* Prevent unused argument(s) compilation warning */
+  if(htim == &htim16)
+  {
+	  if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == GPIO_PIN_RESET)
+	  {
+		  floodFlag = 1; // Set flood flag
+	  }
+	  HAL_TIM_Base_Stop_IT(&htim16);
+  }
 }
 // Function to open the valve
 void openValve()
@@ -197,9 +210,7 @@ void closeValve()
 	for(uint16_t i = 900; i <= 1800; i+=50)
 	{
 		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, i);   	// Set PWM duty cycle for valve Closing
-		HAL_Delay(30
-
-		);
+		HAL_Delay(30);
 	}
 	HAL_Delay(50);
 	HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_1);              	// Stop PWM signal
