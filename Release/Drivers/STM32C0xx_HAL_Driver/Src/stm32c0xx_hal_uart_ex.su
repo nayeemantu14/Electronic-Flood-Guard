@@ -11,7 +11,7 @@
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_uart_ex.c:561:19:HAL_UARTEx_DisableFifoMode	16	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_uart_ex.c:607:19:HAL_UARTEx_SetTxFifoThreshold	24	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_uart_ex.c:656:19:HAL_UARTEx_SetRxFifoThreshold	24	static
-../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_uart_ex.c:718:19:HAL_UARTEx_ReceiveToIdle	32	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_uart_ex.c:718:19:HAL_UARTEx_ReceiveToIdle	40	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_uart_ex.c:857:19:HAL_UARTEx_ReceiveToIdle_IT	16	static,ignoring_inline_asm
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_uart_ex.c:931:19:HAL_UARTEx_ReceiveToIdle_DMA	16	static,ignoring_inline_asm
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_uart_ex.c:1011:29:HAL_UARTEx_GetRxEventType	0	static

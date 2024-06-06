@@ -13,10 +13,10 @@
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:576:19:HAL_TIMEx_HallSensor_Stop_DMA	3
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:638:19:HAL_TIMEx_OCN_Start	12
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:689:19:HAL_TIMEx_OCN_Stop	8
-../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:721:19:HAL_TIMEx_OCN_Start_IT	14
-../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:808:19:HAL_TIMEx_OCN_Stop_IT	11
-../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:883:19:HAL_TIMEx_OCN_Start_DMA	23
-../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:1021:19:HAL_TIMEx_OCN_Stop_DMA	10
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:721:19:HAL_TIMEx_OCN_Start_IT	12
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:808:19:HAL_TIMEx_OCN_Stop_IT	12
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:883:19:HAL_TIMEx_OCN_Start_DMA	21
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:1021:19:HAL_TIMEx_OCN_Stop_DMA	11
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:1122:19:HAL_TIMEx_PWMN_Start	1
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:1172:19:HAL_TIMEx_PWMN_Stop	1
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim_ex.c:1204:19:HAL_TIMEx_PWMN_Start_IT	1

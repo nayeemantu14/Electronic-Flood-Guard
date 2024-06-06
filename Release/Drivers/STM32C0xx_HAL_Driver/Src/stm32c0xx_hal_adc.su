@@ -1,4 +1,4 @@
-../Drivers/STM32C0xx_HAL_Driver/Inc/stm32c0xx_ll_adc.h:3671:22:LL_ADC_SetAnalogWDMonitChannels	12	static
+../Drivers/STM32C0xx_HAL_Driver/Inc/stm32c0xx_ll_adc.h:3671:22:LL_ADC_SetAnalogWDMonitChannels	8	static
 ../Drivers/STM32C0xx_HAL_Driver/Inc/stm32c0xx_ll_adc.h:4434:26:LL_ADC_REG_IsConversionOngoing	0	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_adc.c:867:13:HAL_ADC_MspInit	0	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_adc.c:387:19:HAL_ADC_Init	40	static

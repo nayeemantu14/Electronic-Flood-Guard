@@ -6,9 +6,9 @@
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:380:13:HAL_TIM_Base_MspInit	0	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:395:13:HAL_TIM_Base_MspDeInit	0	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:337:19:HAL_TIM_Base_DeInit	16	static
-../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:411:19:HAL_TIM_Base_Start	0	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:411:19:HAL_TIM_Base_Start	8	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:450:19:HAL_TIM_Base_Stop	0	static
-../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:470:19:HAL_TIM_Base_Start_IT	0	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:470:19:HAL_TIM_Base_Start_IT	8	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:512:19:HAL_TIM_Base_Stop_IT	8	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:537:19:HAL_TIM_Base_Start_DMA	16	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_tim.c:606:19:HAL_TIM_Base_Stop_DMA	8	static

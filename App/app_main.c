@@ -45,7 +45,7 @@ void console(char *log);              		// Function prototype for transmitting m
 int app_main()
 {
 	// Initialize message buffer with default message
-	strcpy(message, "EFloodGuard\r\n");
+	strcpy(message, "EFloodGuard(v3.0)\r\n");
 	// Send initialization message
 	console(message);
 
