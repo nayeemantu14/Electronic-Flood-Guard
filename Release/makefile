@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (12.3.rel1)
+# Toolchain: GNU Tools for STM32 (11.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -62,8 +62,8 @@ all:
 main-build: EFG.elf secondary-outputs
 
 # Tool invocations
-EFG.elf EFG.map: $(OBJS) $(USER_OBJS) C:\Work\Firmware\ST\ Workspace\EFG\STM32C031C6TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "EFG.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Work\Firmware\ST Workspace\EFG\STM32C031C6TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="EFG.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+EFG.elf EFG.map: $(OBJS) $(USER_OBJS) C:\Work\ Folder\Projects\STM32\ Learning\ Projects\Workspace\EFG\STM32C031C6TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "EFG.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Work Folder\Projects\STM32 Learning Projects\Workspace\EFG\STM32C031C6TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="EFG.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

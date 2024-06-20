@@ -1,4 +1,4 @@
-../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_cortex.c:132:6:HAL_NVIC_SetPriority	8	static
+../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_cortex.c:132:6:HAL_NVIC_SetPriority	12	static
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_cortex.c:149:6:HAL_NVIC_EnableIRQ	0	static,ignoring_inline_asm
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_cortex.c:166:6:HAL_NVIC_DisableIRQ	0	static,ignoring_inline_asm
 ../Drivers/STM32C0xx_HAL_Driver/Src/stm32c0xx_hal_cortex.c:179:6:HAL_NVIC_SystemReset	0	static,ignoring_inline_asm

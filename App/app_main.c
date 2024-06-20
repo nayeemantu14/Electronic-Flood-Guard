@@ -10,14 +10,14 @@
 extern ADC_HandleTypeDef hadc1;      		// Declare ADC handler
 extern TIM_HandleTypeDef htim3;      		// Declare Timer 3 handler
 extern UART_HandleTypeDef huart2;    		// Declare UART handler
-extern RTC_HandleTypeDef hrtc;
-extern TIM_HandleTypeDef htim16;
+extern RTC_HandleTypeDef hrtc;				// Declare RTC handler
+extern TIM_HandleTypeDef htim16;			// Declare Timer 16 handler
 
 // Global variable declaration
 char message[40];                     		// Buffer to store messages
 
 uint8_t wupFlag = 1;  						// Initialize wake-up flag
-volatile static uint8_t mbatt_counter;
+volatile static uint8_t mbatt_counter;		// Initialize mbatt_counter flag
 static uint8_t Low_battery;					// Initialize low battery flag
 
 volatile static uint8_t valve_open;			// Initialize valve open flag
@@ -27,8 +27,8 @@ volatile static uint32_t holdTime = 0;    	// Initialize button hold time
 volatile static uint32_t releaseTime = 0;	// Initialize button release time
 volatile static uint32_t pressDuration = 0; // Initialize button press duration
 
-static uint32_t alert_time = 0;					// Initialize alert time
-static uint32_t sleep_time = 0;
+static uint32_t alert_time = 0;				// Initialize alert time
+static uint32_t sleep_time = 0;				// Initialize sleep time
 
 // Function prototypes
 void openValve();                    		// Function prototype for opening the valve
@@ -42,10 +42,10 @@ void batteryled(void);						// Function prototype for activating battery LED
 void console(char *log);              		// Function prototype for transmitting messages via UART
 
 // Main application function
-int app_main()
+int app_main(void)
 {
 	// Initialize message buffer with default message
-	strcpy(message, "EFloodGuard(v3.0)\r\n");
+	strcpy(message, "EFloodGuard(v3.1)\r\n");
 	// Send initialization message
 	console(message);
 
@@ -82,7 +82,7 @@ int app_main()
 			openValve();
 		}
 		// Servicing the short button press during a flood event
-		else if(pressDuration <= 300 && pressDuration >= 50)
+		else if(floodFlag && pressDuration >= 1000)
 		{
 			pressDuration = 0;
 			resetFloodEvent();
